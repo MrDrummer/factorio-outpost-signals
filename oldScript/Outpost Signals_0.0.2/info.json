@@ -1,0 +1,8 @@
+{
+	"name": "Outpost Signals",
+	"version": "0.0.2",
+	"title": "Outpost Signals",
+	"factorio_version": "0.17",
+	"author": "MrDrummer",
+	"description": "Adds more circuit symbols with the idea of remote outposts broadcasting their internal capacity"
+}
