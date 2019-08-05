@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "es2017"
+    ],
+    "module": "commonjs",
+    "noImplicitReturns": true,
+    "outDir": "lib",
+    "sourceMap": true,
+    "target": "es2017",
+    "esModuleInterop": true
+  },
+  "exclude": [
+    "**/__mocks__",
+    "**/*.test.ts",
+    "node_modules"
+  ],
+  "compileOnSave": true,
+  "include": [
+    "src"
+  ]
+}

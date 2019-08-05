@@ -1,0 +1,11 @@
+{
+  "name": "factorio-outpost-signals",
+  "version": "0.1.0",
+  "main": "index.js",
+  "repository": "https://github.com/MrDrummer/factorio-outpost-signals.git",
+  "author": "MrDrummer25 <mrdrummer.programming@hotmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "^3.5.3"
+  }
+}
