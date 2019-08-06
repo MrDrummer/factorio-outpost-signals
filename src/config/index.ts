@@ -1,4 +1,5 @@
-export default [
+import { Signal } from "../types"
+const signals: Signal[] = [
   {
     name: "colours",
     prefix: [
@@ -166,3 +167,5 @@ export default [
     ]
   }
 ]
+
+export default signals

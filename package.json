@@ -6,6 +6,7 @@
   "author": "MrDrummer25 <mrdrummer.programming@hotmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@types/node": "^12.6.9",
     "typescript": "^3.5.3"
   }
 }

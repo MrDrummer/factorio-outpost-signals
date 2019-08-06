@@ -13,3 +13,8 @@ export interface Signal {
   types: Types
   "additional-suffix"?: string[]
 }
+
+export interface BuiltSignal {
+  signalName: string
+  sort: string
+}
