@@ -8,13 +8,18 @@ export interface Types {
 }
 
 export interface Signal {
-  name: string
+  group: string
+  subgroup: string
   prefix: string[]
   types: Types
   "additional-suffix"?: string[]
 }
 
-export interface BuiltSignal {
-  signalName: string
+export interface SignalOptions {
   sort: string
+  prefix: string
+}
+
+export interface BuiltSignal extends SignalOptions {
+  signalName: string
 }
