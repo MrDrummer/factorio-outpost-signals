@@ -18,7 +18,7 @@ function mapLua (signals) {
     const lua = []
     lua.push("  {")
     for (const key of Object.keys(signal)) {
-      lua.push(`    ${ key } = ${ typeof signal[key] === "string" ? `"${ signal[key] }"` : signal[key] },`)
+      lua.push(`    ${key} = ${typeof signal[key] === "string" ? `"${signal[key]}"` : signal[key]},`)
     }
     lua.push("  },")
     return lua.join("\n")
@@ -58,7 +58,7 @@ async function run () {
         for (const alpha of alphaRange) {
 
           pushSignal(signalPrefix, alpha, {
-            sort: `${ [signalGroupIndex, signalPrefixIndex, signalSuffixIndex].map(getChar).join("-") }-${ alpha }`,
+            sort: `${[signalGroupIndex, signalPrefixIndex, signalSuffixIndex].map(getChar).join("-")}-${alpha}`,
             prefix: signalPrefix
           })
           signalSuffixIndex++
@@ -68,13 +68,13 @@ async function run () {
       const numbers = signalConfig.types.numbers
       signalGroups.push({
         name: `virtual-signal-${signalPrefix}`,
-        order: `${ [signalGroupIndex, signalPrefixIndex].map(getChar).join("-") }`
+        order: `${[signalGroupIndex, signalPrefixIndex].map(getChar).join("-")}`
       })
 
       if (signalConfig["additional-suffix"]) {
         signalGroups.push(...signalConfig["additional-suffix"].map(suffix => ({
-          name: `virtual-signal-${ signalPrefix }-${ suffix }`,
-          order: `${ [signalGroupIndex, signalPrefixIndex].map(getChar).join("-") }`
+          name: `virtual-signal-${signalPrefix}-${suffix}`,
+          order: `${[signalGroupIndex, signalPrefixIndex].map(getChar).join("-")}`
         })))
       }
 
@@ -83,7 +83,7 @@ async function run () {
 
         for (let index = numbers.start; index < (numbers.start + numbers.quantity); index++) {
           pushSignal(signalPrefix, index.toString(), {
-            sort: `${ [signalGroupIndex, signalSuffixIndex].map(getChar).join("-") }-${ alphaRange[index] }`,
+            sort: `${[signalGroupIndex, signalSuffixIndex].map(getChar).join("-")}-${alphaRange[index]}`,
             prefix: signalPrefix
           })
 
@@ -91,8 +91,8 @@ async function run () {
           if (suffixs) {
             let additionalSuffixIndex = 0
             for (const suffix of suffixs) {
-              pushSignal(signalPrefix, `${ index }-${ suffix }`, {
-                sort: `${ [signalGroupIndex, signalPrefixIndex].map(getChar).join("-") }-${ suffix }-${ alphaRange[index] }-${ additionalSuffixIndex }`,
+              pushSignal(signalPrefix, `${index}-${suffix}`, {
+                sort: `${[signalGroupIndex, signalPrefixIndex].map(getChar).join("-")}-${suffix}-${alphaRange[index]}-${additionalSuffixIndex}`,
                 prefix: signalPrefix
               })
               additionalSuffixIndex++
@@ -119,9 +119,9 @@ async function run () {
   signalsToFormat.push(...sorted.map(signal => ({
     type: "virtual-signal",
     name: signal.signalName,
-    icon: `__Outpost Signals__/graphics/${ signal.signalName }.png`,
+    icon: `__Outpost Signals__/graphics/${signal.signalName}.png`,
     icon_size: 32,
-    subgroup: `virtual-signal-${ signal.prefix }`,
+    subgroup: `virtual-signal-${signal.prefix}`,
     order: signal.sort
   })))
 
@@ -147,7 +147,7 @@ async function run () {
 
   groupSignalsToFormat.push(...signalGroups.map(signalConfig => ({
     type: "item-subgroup",
-    name: `virtual-${ signalConfig.signalName }`,
+    name: `virtual-${signalConfig.signalName}`,
     group: "outpost-signals",
     order: signalConfig.sort
   })))
