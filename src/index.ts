@@ -3,12 +3,14 @@ const path = require("path")
 import config from "./config/"
 import { BuiltSignal, Numbers, Signal, SignalOptions, Types } from "./types"
 
+const builtSignals: BuiltSignal[] = []
+
 function mapLua (signals) {
   return signals.map(signal => {
     const lua = []
     lua.push("  {")
     for (const key of Object.keys(signal)) {
-      lua.push(`    ${key} = ${typeof signal[key] === "string" ? `"${signal[key]}"` : signal[key]},`)
+      lua.push(`    ${ key } = ${ typeof signal[key] === "string" ? `"${ signal[key] }"` : signal[key] },`)
     }
     lua.push("  },")
     return lua.join("\n")
@@ -19,52 +21,71 @@ function alphaRange () {
   return "ABCDEFGHIJKLMNOPQRSTUVQXYZ".split("")
 }
 
-async function run () {
-  const builtSignals: BuiltSignal[] = []
-  const signalGroups = []
-  function pushSignal (prefix: string, suffix: string, options: SignalOptions) {
-    const signalName = [
-      "signal"
-    ]
-    signalName.push(prefix)
-    if (suffix) signalName.push(suffix)
-    const builtSignal: BuiltSignal = {
-      signalName: signalName.join("-"),
-      sort: options.sort,
-      prefix: options.prefix
-    }
-    builtSignals.push(builtSignal)
+function pushSignal (prefix: string, suffix: string, options: SignalOptions) {
+  const signalName = [
+    "signal"
+  ]
+  signalName.push(prefix)
+  if (suffix) signalName.push(suffix)
+  const builtSignal: BuiltSignal = {
+    signalName: signalName.join("-"),
+    sort: options.sort,
+    prefix: options.prefix
   }
+  builtSignals.push(builtSignal)
+}
 
+async function run () {
+  const signalGroups = []
+
+  // Config section
   let signalGroupCount = 0
   for (const signalConfig of config) {
-    let prefixCount = 0
+
+    // Main Signal Prefix
     for (const signalPrefix of signalConfig.prefix) {
+      let prefixCount = 0
+
+      // Alpha Variants
       if (signalConfig.types.letters) {
         for (const a of alphaRange()) {
+
           pushSignal(signalPrefix, a, {
-            sort: `${signalGroupCount.toString(36)}-${prefixCount.toString(36)}-${a}`,
+            sort: `${ signalGroupCount.toString(36) }-${ prefixCount.toString(36) }-${ a }`,
             prefix: signalPrefix
           })
+          prefixCount++
         }
       }
 
       const numbers = signalConfig.types.numbers
-      signalGroups.push(`virtual-signal-${signalPrefix}`)
-      if (signalConfig["additional-suffix"]) signalGroups.push(...signalConfig["additional-suffix"].map(suffix => `virtual-signal-${signalPrefix}-${suffix}`))
+      signalGroups.push({
+        name: `virtual-signal-${signalPrefix}`,
+        order: `${ signalGroupCount.toString(36) } - ${ prefixCount.toString(36) }`
+      })
 
+      if (signalConfig["additional-suffix"]) {
+        signalGroups.push(...signalConfig["additional-suffix"].map(suffix => ({
+          name: `virtual-signal-${ signalPrefix }-${ suffix }`,
+          order: ""
+        })))
+      }
+
+      // Numeric Range
       if (numbers) {
+
         for (let index = numbers.start; index < (numbers.start + numbers.quantity); index++) {
           pushSignal(signalPrefix, index.toString(), {
-            sort: `${signalGroupCount.toString(36)}-${prefixCount.toString(36)}-${alphaRange()[index]}`,
+            sort: `${ signalGroupCount.toString(36) }-${ prefixCount.toString(36) }-${ alphaRange()[index] }`,
             prefix: signalPrefix
           })
 
           const suffixs = signalConfig["additional-suffix"]
           if (suffixs) {
+
             for (const suffix of suffixs) {
-              pushSignal(signalPrefix, `${index}-${suffix}`, {
-                sort: `${signalGroupCount.toString(36)}-${prefixCount.toString(36)}-${suffix}-${alphaRange()[index]}`,
+              pushSignal(signalPrefix, `${ index }-${ suffix }`, {
+                sort: `${ signalGroupCount.toString(36) }-${ prefixCount.toString(36) }-${ suffix }-${ alphaRange()[index] }`,
                 prefix: signalPrefix
               })
             }
@@ -89,9 +110,9 @@ async function run () {
   signalsToFormat.push(...sorted.map(signal => ({
     type: "virtual-signal",
     name: signal.signalName,
-    icon: `__Outpost Signals__/graphics/${signal.signalName}.png`,
+    icon: `__Outpost Signals__/graphics/${ signal.signalName }.png`,
     icon_size: 32,
-    subgroup: `virtual-signal-${signal.prefix}`,
+    subgroup: `virtual-signal-${ signal.prefix }`,
     order: signal.sort
   })))
 
@@ -117,7 +138,7 @@ async function run () {
 
   groupSignalsToFormat.push(...signalGroups.map(signalConfig => ({
     type: "item-subgroup",
-    name: `virtual-${signalConfig.signalName}`,
+    name: `virtual-${ signalConfig.signalName }`,
     group: "outpost-signals",
     order: signalConfig.sort
   })))
