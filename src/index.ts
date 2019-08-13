@@ -5,6 +5,14 @@ import { BuiltSignal, Numbers, Signal, SignalOptions, Types } from "./types"
 
 const builtSignals: BuiltSignal[] = []
 
+function getChar (index) {
+  if (typeof index !== "number") throw Error("Variable passed must be a number!")
+  if (index < 0) throw Error("Index smaller than 0!")
+  if (index > 36) throw Error("Index greater than 36!")
+
+  return index.toString(36)
+}
+
 function mapLua (signals) {
   return signals.map(signal => {
     const lua = []
@@ -17,9 +25,7 @@ function mapLua (signals) {
   })
 }
 
-function alphaRange () {
-  return "ABCDEFGHIJKLMNOPQRSTUVQXYZ".split("")
-}
+const alphaRange = "ABCDEFGHIJKLMNOPQRSTUVQXYZ".split("")
 
 function pushSignal (prefix: string, suffix: string, options: SignalOptions) {
   const signalName = [
@@ -39,35 +45,36 @@ async function run () {
   const signalGroups = []
 
   // Config section
-  let signalGroupCount = 0
+  let signalGroupIndex = 0
   for (const signalConfig of config) {
 
     // Main Signal Prefix
+    let signalPrefixIndex = 0
     for (const signalPrefix of signalConfig.prefix) {
-      let prefixCount = 0
 
       // Alpha Variants
+      let signalSuffixIndex = 0
       if (signalConfig.types.letters) {
-        for (const a of alphaRange()) {
+        for (const alpha of alphaRange) {
 
-          pushSignal(signalPrefix, a, {
-            sort: `${ signalGroupCount.toString(36) }-${ prefixCount.toString(36) }-${ a }`,
+          pushSignal(signalPrefix, alpha, {
+            sort: `${ [signalGroupIndex, signalPrefixIndex, signalSuffixIndex].map(getChar).join("-") }-${ alpha }`,
             prefix: signalPrefix
           })
-          prefixCount++
+          signalSuffixIndex++
         }
       }
 
       const numbers = signalConfig.types.numbers
       signalGroups.push({
         name: `virtual-signal-${signalPrefix}`,
-        order: `${ signalGroupCount.toString(36) } - ${ prefixCount.toString(36) }`
+        order: `${ [signalGroupIndex, signalPrefixIndex].map(getChar).join("-") }`
       })
 
       if (signalConfig["additional-suffix"]) {
         signalGroups.push(...signalConfig["additional-suffix"].map(suffix => ({
           name: `virtual-signal-${ signalPrefix }-${ suffix }`,
-          order: ""
+          order: `${ [signalGroupIndex, signalPrefixIndex].map(getChar).join("-") }`
         })))
       }
 
@@ -76,25 +83,27 @@ async function run () {
 
         for (let index = numbers.start; index < (numbers.start + numbers.quantity); index++) {
           pushSignal(signalPrefix, index.toString(), {
-            sort: `${ signalGroupCount.toString(36) }-${ prefixCount.toString(36) }-${ alphaRange()[index] }`,
+            sort: `${ [signalGroupIndex, signalSuffixIndex].map(getChar).join("-") }-${ alphaRange[index] }`,
             prefix: signalPrefix
           })
 
           const suffixs = signalConfig["additional-suffix"]
           if (suffixs) {
-
+            let additionalSuffixIndex = 0
             for (const suffix of suffixs) {
               pushSignal(signalPrefix, `${ index }-${ suffix }`, {
-                sort: `${ signalGroupCount.toString(36) }-${ prefixCount.toString(36) }-${ suffix }-${ alphaRange()[index] }`,
+                sort: `${ [signalGroupIndex, signalPrefixIndex].map(getChar).join("-") }-${ suffix }-${ alphaRange[index] }-${ additionalSuffixIndex }`,
                 prefix: signalPrefix
               })
+              additionalSuffixIndex++
             }
           }
+          signalSuffixIndex++
         }
       }
-      prefixCount++
+      signalPrefixIndex++
     }
-    signalGroupCount++
+    signalGroupIndex++
   }
 
   const sorted = builtSignals.sort((a, b) => {
