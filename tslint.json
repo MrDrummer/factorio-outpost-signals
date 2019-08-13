@@ -1,4 +1,5 @@
 {
+  "extends": "tslint:recommended",
   "rules": {
     // -- Strict errors --
     // These lint rules are likely always a good idea.
@@ -51,8 +52,6 @@
     "no-string-throw": true,
     // Disallow control flow statements, such as return, continue, break, and throw in finally blocks.
     "no-unsafe-finally": true,
-    // Do not allow variables to be used before they are declared.
-    "no-use-before-declare": true,
     // Expressions must always return a value. Avoids common errors like const myValue = functionReturningVoid();
     "no-void-expression": [
       true,
@@ -188,7 +187,7 @@
     "prefer-template": false, // Should be true
     "prefer-while": true,
     "return-undefined": true,
-    "strict-type-predicates": true,
+    "strict-type-predicates": false,
     "variable-name": false, // Should be true
     "whitespace": [
       true,
@@ -203,7 +202,13 @@
       "check-type-operator",
       "check-preblock"
       // "check-postbrace"
-    ]
+    ],
+    "interface-over-type-literal": false,
+    "interface-name": false,
+    "no-console": false,
+    "arrow-parens": {
+      "options": "ban-single-arg-parens"
+    }
   },
   "defaultSeverity": "error"
 }

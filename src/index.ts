@@ -1,9 +1,13 @@
-const fs = require("fs")
-const path = require("path")
+import fs from "fs"
 import config from "./config/"
+
 import { BuiltSignal, Numbers, Signal, SignalOptions, Types } from "./types"
 
 const builtSignals: BuiltSignal[] = []
+
+function log (...args) {
+  console.log(...args)
+}
 
 function getChar (index) {
   if (typeof index !== "number") throw Error("Variable passed must be a number!")
@@ -28,6 +32,7 @@ function mapLua (signals) {
 const alphaRange = "ABCDEFGHIJKLMNOPQRSTUVQXYZ".split("")
 
 function pushSignal (prefix: string, suffix: string, options: SignalOptions) {
+  log(options.sort)
   const signalName = [
     "signal"
   ]
@@ -47,18 +52,22 @@ async function run () {
   // Config section
   let signalGroupIndex = 0
   for (const signalConfig of config) {
+    log("=========================================")
+    log("signalConfig:", signalConfig)
 
     // Main Signal Prefix
     let signalPrefixIndex = 0
     for (const signalPrefix of signalConfig.prefix) {
+      log("signalPrefix:", signalPrefix)
 
       // Alpha Variants
       let signalSuffixIndex = 0
       if (signalConfig.types.letters) {
         for (const alpha of alphaRange) {
+          log("alpha:", alpha)
 
           pushSignal(signalPrefix, alpha, {
-            sort: `${[signalGroupIndex, signalPrefixIndex, signalSuffixIndex].map(getChar).join("-")}-${alpha}`,
+            sort: `${[signalGroupIndex, signalPrefixIndex, signalSuffixIndex].map(getChar).join("-")}`,
             prefix: signalPrefix
           })
           signalSuffixIndex++
@@ -72,9 +81,9 @@ async function run () {
       })
 
       if (signalConfig["additional-suffix"]) {
-        signalGroups.push(...signalConfig["additional-suffix"].map(suffix => ({
+        signalGroups.push(...signalConfig["additional-suffix"].map((suffix, index) => ({
           name: `virtual-signal-${signalPrefix}-${suffix}`,
-          order: `${[signalGroupIndex, signalPrefixIndex].map(getChar).join("-")}`
+          order: `${[signalGroupIndex, signalPrefixIndex, index].map(getChar).join("-")}`
         })))
       }
 
@@ -82,17 +91,23 @@ async function run () {
       if (numbers) {
 
         for (let index = numbers.start; index < (numbers.start + numbers.quantity); index++) {
-          pushSignal(signalPrefix, index.toString(), {
-            sort: `${[signalGroupIndex, signalSuffixIndex].map(getChar).join("-")}-${alphaRange[index]}`,
+          log("number index:", index)
+
+          pushSignal(signalPrefix, `${index}`, {
+            sort: `${[signalGroupIndex, signalPrefixIndex, signalSuffixIndex].map(getChar).join("-")}-${alphaRange[index]}`,
             prefix: signalPrefix
           })
 
           const suffixs = signalConfig["additional-suffix"]
           if (suffixs) {
             let additionalSuffixIndex = 0
+
+            // Number additional suffix
             for (const suffix of suffixs) {
+              log("number index suffix:", suffix)
+
               pushSignal(signalPrefix, `${index}-${suffix}`, {
-                sort: `${[signalGroupIndex, signalPrefixIndex].map(getChar).join("-")}-${suffix}-${alphaRange[index]}-${additionalSuffixIndex}`,
+                sort: `${[signalGroupIndex, signalPrefixIndex, signalSuffixIndex, index].map(getChar).join("-")}-${additionalSuffixIndex}`,
                 prefix: signalPrefix
               })
               additionalSuffixIndex++
@@ -112,7 +127,7 @@ async function run () {
     return 0
   })
 
-  await fs.writeFileSync("./signals.json", JSON.stringify(builtSignals))
+  fs.writeFileSync("./signals.json", JSON.stringify(builtSignals))
 
   // SIGNALS
   const signalsToFormat = []
@@ -131,7 +146,7 @@ async function run () {
   luaSignals.push("})")
 
   const luaSignalsOut = luaSignals.join("\n")
-  await fs.writeFileSync("../output/prototypes/outpost_signals.lua", luaSignalsOut)
+  fs.writeFileSync("../output/prototypes/outpost_signals.lua", luaSignalsOut)
   // END
 
   // SIGNAL GROUPS
@@ -142,14 +157,14 @@ async function run () {
     order: "t",
     inventory_order: "z",
     icon: "__Outpost Signals__/graphics/signals.png",
-    icon_size: "32"
+    icon_size: 32
   })
 
   groupSignalsToFormat.push(...signalGroups.map(signalConfig => ({
     type: "item-subgroup",
-    name: `virtual-${signalConfig.signalName}`,
+    name: `virtual-${signalConfig.name}`,
     group: "outpost-signals",
-    order: signalConfig.sort
+    order: signalConfig.order
   })))
   // END
 
@@ -159,7 +174,7 @@ async function run () {
   luaSignalGroups.push("})")
   const luaSignalGroupsOut = luaSignalGroups.join("\n")
 
-  await fs.writeFileSync("../output/prototypes/item-groups.lua", luaSignalGroupsOut)
+  fs.writeFileSync("../output/prototypes/item-groups.lua", luaSignalGroupsOut)
 }
 
 // tslint:disable-next-line: no-floating-promises
