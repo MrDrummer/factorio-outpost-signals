@@ -22,3 +22,10 @@ export interface SignalOptions {
 export interface BuiltSignal extends SignalOptions {
   signalName: string
 }
+
+export interface ImageMeta {
+  name: string
+  prefix: string
+  suffix: string | number
+  additionalSuffix: string | false
+}

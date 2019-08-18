@@ -1,6 +1,6 @@
 import { Signal } from "../types"
-const signals: Signal[] = [
-  {
+const signalsConfig: Signal[] = [
+  /*{
     group: "alpha",
     prefix: [
       "cyan_blue",
@@ -22,12 +22,12 @@ const signals: Signal[] = [
         quantity: 10
       }
     }
-  },
+  },*/
   {
     group: "ore",
     prefix: [
-      "ironore",
-      "copperore",
+      "iron_ore",
+      "copper_ore",
       "oil"
     ],
     types: {
@@ -45,8 +45,8 @@ const signals: Signal[] = [
   {
     group: "ore",
     prefix: [
-      "coalore",
-      "uraniumore"
+      "coal_ore",
+      "uranium_ore"
     ],
     types: {
       letters: false,
@@ -63,7 +63,7 @@ const signals: Signal[] = [
   {
     group: "ore",
     prefix: [
-      "stoneore"
+      "stone_ore"
     ],
     types: {
       letters: false,
@@ -168,4 +168,42 @@ const signals: Signal[] = [
   }
 ]
 
-export default signals
+export const signalIconConfig = {
+  cyan_blue: "cyan_blue",
+  dark_blue: "dark_blue",
+  green: "green",
+  grey: "grey",
+  light_blue: "light_blue",
+  lime_green: "lime_green",
+  orange: "orange",
+  pink: "pink",
+  red: "red",
+  white: "white",
+  yellow: "yellow",
+
+  iron_ore: "cyan_blue",
+  copper_ore: "orange",
+  oil: "grey",
+
+  coal_ore: "grey",
+  uranium_ore: "lime_green",
+  stone_ore: "white",
+
+  ironplate: "cyan_blue",
+  steelplate: "light_blue",
+  copperplate: "orange",
+
+  greencircuit: "green",
+  redcircuit: "red",
+  bluecircuit: "dark_blue",
+
+  ammo: "pink",
+  bot: "pink",
+  furnace: "pink",
+  modules: "pink",
+  nuclear_fuel: "pink",
+  repair: "pink",
+  misc: "pink"
+}
+
+export const signals = signalsConfig

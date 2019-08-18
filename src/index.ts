@@ -1,10 +1,12 @@
 import fs from "fs"
-import config from "./config/"
-
-import { BuiltSignal, Numbers, Signal, SignalOptions, Types } from "./types"
+import jimp from "jimp"
+import { signalIconConfig, signals as config } from "./config/"
+import { BuiltSignal, ImageMeta, SignalOptions } from "./types"
 
 const builtSignals: BuiltSignal[] = []
+const signalsImageMeta: ImageMeta[] = []
 const localeNames = {}
+const localeGroupNames = {}
 
 const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1)
 
@@ -52,6 +54,7 @@ function pushSignal (prefix: string, suffix: string, options: SignalOptions) {
     prefix: options.prefix
   }
   builtSignals.push(builtSignal)
+  return builtSignal
 }
 
 async function run () {
@@ -74,27 +77,38 @@ async function run () {
         for (const alpha of alphaRange) {
           log("alpha:", alpha)
 
-          pushSignal(signalPrefix, alpha, {
+          const signalNameFull = pushSignal(signalPrefix, alpha, {
             sort: `${ [signalSuffixIndex].map(getChar).join("-") }`,
             prefix: signalPrefix
           })
+          signalsImageMeta.push({
+            name: signalNameFull.signalName,
+            prefix: signalPrefix,
+            suffix: alpha,
+            additionalSuffix: false
+          })
+
           signalSuffixIndex++
         }
       }
 
+      const localeGroupName = `outpost-signals-${ signalConfig.group }`
+      localeGroupNames[localeGroupName] = `Outpost Signals ${ capitalizeFirstLetter(signalConfig.group) }`
       const numbers = signalConfig.types.numbers
       signalGroups.push({
         name: `virtual-signal-${ signalPrefix }`,
         order: `${ [signalGroupIndex, signalPrefixIndex].map(getChar).join("-") }`,
-        group: `outpost-signals-${ signalConfig.group }`
+        group: localeGroupName
       })
 
       if (signalConfig["additional-suffix"]) {
-        signalGroups.push(...signalConfig["additional-suffix"].map((suffix, index) => ({
-          name: `virtual-signal-${ signalPrefix }-${ suffix }`,
-          order: `${ [signalGroupIndex, signalPrefixIndex, index].map(getChar).join("-") }`,
-          group: `outpost-signals-${ signalConfig.group }`
-        })))
+        signalGroups.push(...signalConfig["additional-suffix"].map((suffix, index) => {
+          return {
+            name: `virtual-signal-${ signalPrefix }-${ suffix }`,
+            order: `${ [signalGroupIndex, signalPrefixIndex, index].map(getChar).join("-") }`,
+            group: localeGroupName
+          }
+        }))
       }
 
       // Numeric Range
@@ -103,9 +117,15 @@ async function run () {
         for (let index = numbers.start; index < (numbers.start + numbers.quantity); index++) {
           log("number index:", index)
 
-          pushSignal(signalPrefix, `${ index }`, {
+          const signalNameFull = pushSignal(signalPrefix, `${ index }`, {
             sort: `${ [signalSuffixIndex].map(getChar).join("-") }-${ alphaRange[index] }`,
             prefix: signalPrefix
+          })
+          signalsImageMeta.push({
+            name: signalNameFull.signalName,
+            prefix: signalPrefix,
+            suffix: index,
+            additionalSuffix: false
           })
 
           const suffixs = signalConfig["additional-suffix"]
@@ -116,9 +136,15 @@ async function run () {
             for (const suffix of suffixs) {
               log("number index suffix:", suffix)
 
-              pushSignal(signalPrefix, `${ index }-${ suffix }`, {
+              const signalNameFull2 = pushSignal(signalPrefix, `${ index }-${ suffix }`, {
                 sort: `${ [signalSuffixIndex, index].map(getChar).join("-") }-${ additionalSuffixIndex }`,
                 prefix: signalPrefix
+              })
+              signalsImageMeta.push({
+                name: signalNameFull2.signalName,
+                prefix: signalPrefix,
+                suffix: index,
+                additionalSuffix: suffix
               })
               additionalSuffixIndex++
             }
@@ -191,6 +217,14 @@ async function run () {
   cfg.push(objLua(localeNames, true))
   cfg.push("[item-group-name]")
 
+  console.log("signalsImageMeta", signalsImageMeta)
+
+  const imgPromises = []
+  for (const imgMeta of signalsImageMeta) {
+    imgPromises.push(jimp.read(`../graphics_base/${ signalIconConfig[imgMeta.prefix] }.png`).then(value => value.write(`../output/graphics/${ imgMeta.name }.png`)).catch(e => console.error("Oops!", e)))
+  }
+
+  await Promise.all(imgPromises)
 
   // console.log("signalNames", signalNames)
 }
