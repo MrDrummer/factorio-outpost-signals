@@ -67,7 +67,7 @@ async function run () {
           log("alpha:", alpha)
 
           pushSignal(signalPrefix, alpha, {
-            sort: `${[signalGroupIndex, signalPrefixIndex, signalSuffixIndex].map(getChar).join("-")}`,
+            sort: `${[signalSuffixIndex].map(getChar).join("-")}`,
             prefix: signalPrefix
           })
           signalSuffixIndex++
@@ -94,7 +94,7 @@ async function run () {
           log("number index:", index)
 
           pushSignal(signalPrefix, `${index}`, {
-            sort: `${[signalGroupIndex, signalPrefixIndex, signalSuffixIndex].map(getChar).join("-")}-${alphaRange[index]}`,
+            sort: `${[signalSuffixIndex].map(getChar).join("-")}-${alphaRange[index]}`,
             prefix: signalPrefix
           })
 
@@ -107,7 +107,7 @@ async function run () {
               log("number index suffix:", suffix)
 
               pushSignal(signalPrefix, `${index}-${suffix}`, {
-                sort: `${[signalGroupIndex, signalPrefixIndex, signalSuffixIndex, index].map(getChar).join("-")}-${additionalSuffixIndex}`,
+                sort: `${[signalSuffixIndex, index].map(getChar).join("-")}-${additionalSuffixIndex}`,
                 prefix: signalPrefix
               })
               additionalSuffixIndex++

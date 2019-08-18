@@ -1,6 +1,6 @@
 import { Signal } from "../types"
 const signals: Signal[] = [
-  /*{
+  {
     group: "alpha",
     subgroup: "colours",
     prefix: [
@@ -23,7 +23,7 @@ const signals: Signal[] = [
         quantity: 10
       }
     }
-  },*/
+  },
   {
     group: "ore",
     subgroup: "ore",
@@ -43,8 +43,7 @@ const signals: Signal[] = [
       "ammo",
       "repair"
     ]
-  }
-  /*,
+  },
   {
     group: "ore",
     subgroup: "ore",
@@ -176,7 +175,6 @@ const signals: Signal[] = [
       "repair"
     ]
   }
-  */
 ]
 
 export default signals
