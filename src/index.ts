@@ -4,6 +4,9 @@ import config from "./config/"
 import { BuiltSignal, Numbers, Signal, SignalOptions, Types } from "./types"
 
 const builtSignals: BuiltSignal[] = []
+const localeNames = {}
+
+const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1)
 
 function log (...args) {
   console.log(...args)
@@ -17,29 +20,34 @@ function getChar (index) {
   return index.toString(36)
 }
 
+function objLua (signal, cfg = false) {
+  const lua = []
+  if (!cfg) lua.push("  {")
+  for (const key of Object.keys(signal)) {
+    lua.push((!cfg ? "    " : "") + `${ key } = ${ typeof signal[key] === "string" && !cfg ? `"${ signal[key] }"` : signal[key] }${ !cfg ? "," : ""}`)
+  }
+  if (!cfg) lua.push("  },")
+  return lua.join("\n")
+}
+
 function mapLua (signals) {
-  return signals.map(signal => {
-    const lua = []
-    lua.push("  {")
-    for (const key of Object.keys(signal)) {
-      lua.push(`    ${key} = ${typeof signal[key] === "string" ? `"${signal[key]}"` : signal[key]},`)
-    }
-    lua.push("  },")
-    return lua.join("\n")
-  })
+  return signals.map(sig => objLua(sig, false))
 }
 
 const alphaRange = "ABCDEFGHIJKLMNOPQRSTUVQXYZ".split("")
 
 function pushSignal (prefix: string, suffix: string, options: SignalOptions) {
   log(options.sort)
-  const signalName = [
-    "signal"
-  ]
-  signalName.push(prefix)
-  if (suffix) signalName.push(suffix)
+  const signalNameAssemble = []
+  signalNameAssemble.push(prefix)
+  if (suffix) signalNameAssemble.push(suffix)
+  const signalName = "signal_" + signalNameAssemble.join("-")
+  const name = prefix.split("_")
+  name.push("Signal")
+  name.push(...suffix.split("-"))
+  localeNames[signalName] = name.map(capitalizeFirstLetter).join(" ")
   const builtSignal: BuiltSignal = {
-    signalName: signalName.join("-"),
+    signalName,
     sort: options.sort,
     prefix: options.prefix
   }
@@ -77,13 +85,15 @@ async function run () {
       const numbers = signalConfig.types.numbers
       signalGroups.push({
         name: `virtual-signal-${signalPrefix}`,
-        order: `${[signalGroupIndex, signalPrefixIndex].map(getChar).join("-")}`
+        order: `${[signalGroupIndex, signalPrefixIndex].map(getChar).join("-")}`,
+        group: `outpost-signals-${ signalConfig.group }`
       })
 
       if (signalConfig["additional-suffix"]) {
         signalGroups.push(...signalConfig["additional-suffix"].map((suffix, index) => ({
           name: `virtual-signal-${signalPrefix}-${suffix}`,
-          order: `${[signalGroupIndex, signalPrefixIndex, index].map(getChar).join("-")}`
+          order: `${ [signalGroupIndex, signalPrefixIndex, index].map(getChar).join("-") }`,
+          group: `outpost-signals-${ signalConfig.group }`
         })))
       }
 
@@ -162,8 +172,8 @@ async function run () {
 
   groupSignalsToFormat.push(...signalGroups.map(signalConfig => ({
     type: "item-subgroup",
-    name: `virtual-${signalConfig.name}`,
-    group: "outpost-signals",
+    name: signalConfig.name,
+    group: signalConfig.group,
     order: signalConfig.order
   })))
   // END
@@ -175,6 +185,14 @@ async function run () {
   const luaSignalGroupsOut = luaSignalGroups.join("\n")
 
   fs.writeFileSync("../output/prototypes/item-groups.lua", luaSignalGroupsOut)
+
+  const cfg = []
+  cfg.push("[virtual-signal-name]")
+  cfg.push(objLua(localeNames, true))
+  cfg.push("[item-group-name]")
+
+
+  // console.log("signalNames", signalNames)
 }
 
 // tslint:disable-next-line: no-floating-promises

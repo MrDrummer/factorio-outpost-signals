@@ -2,7 +2,6 @@ import { Signal } from "../types"
 const signals: Signal[] = [
   {
     group: "alpha",
-    subgroup: "colours",
     prefix: [
       "cyan_blue",
       "dark_blue",
@@ -26,7 +25,6 @@ const signals: Signal[] = [
   },
   {
     group: "ore",
-    subgroup: "ore",
     prefix: [
       "ironore",
       "copperore",
@@ -46,7 +44,6 @@ const signals: Signal[] = [
   },
   {
     group: "ore",
-    subgroup: "ore",
     prefix: [
       "coalore",
       "uraniumore"
@@ -65,7 +62,6 @@ const signals: Signal[] = [
   },
   {
     group: "ore",
-    subgroup: "ore",
     prefix: [
       "stoneore"
     ],
@@ -83,7 +79,6 @@ const signals: Signal[] = [
   },
   {
     group: "other",
-    subgroup: "metalplates",
     prefix: [
       "ironplate",
       "copperplate",
@@ -103,7 +98,6 @@ const signals: Signal[] = [
   },
   {
     group: "other",
-    subgroup: "circuits",
     prefix: [
       "greencircuit",
       "redcircuit",
@@ -123,7 +117,6 @@ const signals: Signal[] = [
   },
   {
     group: "other",
-    subgroup: "misc",
     prefix: [
       "ammo",
       "bot",
@@ -145,7 +138,6 @@ const signals: Signal[] = [
   },
   {
     group: "other",
-    subgroup: "repair",
     prefix: [
       "repair"
     ],
@@ -159,7 +151,6 @@ const signals: Signal[] = [
   },
   {
     group: "other",
-    subgroup: "misc",
     prefix: [
       "misc"
     ],

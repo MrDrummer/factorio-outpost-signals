@@ -9,7 +9,6 @@ export interface Types {
 
 export interface Signal {
   group: string
-  subgroup: string
   prefix: string[]
   types: Types
   "additional-suffix"?: string[]
