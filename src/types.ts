@@ -10,6 +10,7 @@ export interface Types {
 export interface Signal {
   group: string
   prefix: string[]
+  icon: boolean
   types: Types
   "additional-suffix"?: string[]
 }
@@ -27,5 +28,6 @@ export interface ImageMeta {
   name: string
   prefix: string
   suffix: string | number
+  icon: boolean
   additionalSuffix: string | false
 }

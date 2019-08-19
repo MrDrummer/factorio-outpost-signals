@@ -1,6 +1,6 @@
 import { Signal } from "../types"
 const signalsConfig: Signal[] = [
-  /*{
+  {
     group: "alpha",
     prefix: [
       "cyan_blue",
@@ -15,6 +15,7 @@ const signalsConfig: Signal[] = [
       "white",
       "yellow"
     ],
+    icon: false,
     types: {
       letters: true,
       numbers: {
@@ -22,14 +23,15 @@ const signalsConfig: Signal[] = [
         quantity: 10
       }
     }
-  },*/
+  },
   {
     group: "ore",
     prefix: [
-      "iron_ore",
-      "copper_ore",
+      "ironore",
+      "copperore",
       "oil"
     ],
+    icon: true,
     types: {
       letters: false,
       numbers: {
@@ -45,9 +47,10 @@ const signalsConfig: Signal[] = [
   {
     group: "ore",
     prefix: [
-      "coal_ore",
-      "uranium_ore"
+      "coalore",
+      "uraniumore"
     ],
+    icon: true,
     types: {
       letters: false,
       numbers: {
@@ -63,8 +66,9 @@ const signalsConfig: Signal[] = [
   {
     group: "ore",
     prefix: [
-      "stone_ore"
+      "stoneore"
     ],
+    icon: true,
     types: {
       letters: false,
       numbers: {
@@ -84,6 +88,7 @@ const signalsConfig: Signal[] = [
       "copperplate",
       "steelplate"
     ],
+    icon: true,
     types: {
       letters: false,
       numbers: {
@@ -103,6 +108,7 @@ const signalsConfig: Signal[] = [
       "redcircuit",
       "bluecircuit"
     ],
+    icon: true,
     types: {
       letters: false,
       numbers: {
@@ -118,12 +124,12 @@ const signalsConfig: Signal[] = [
   {
     group: "other",
     prefix: [
-      "ammo",
       "bot",
       "furnace",
       "modules",
       "nuclear_fuel"
     ],
+    icon: true,
     types: {
       letters: false,
       numbers: {
@@ -139,8 +145,10 @@ const signalsConfig: Signal[] = [
   {
     group: "other",
     prefix: [
+      "ammo",
       "repair"
     ],
+    icon: true,
     types: {
       letters: false,
       numbers: {
@@ -154,6 +162,7 @@ const signalsConfig: Signal[] = [
     prefix: [
       "misc"
     ],
+    icon: true,
     types: {
       letters: false,
       numbers: {
@@ -181,13 +190,13 @@ export const signalIconConfig = {
   white: "white",
   yellow: "yellow",
 
-  iron_ore: "cyan_blue",
-  copper_ore: "orange",
-  oil: "grey",
+  ironore: "cyan_blue",
+  copperore: "orange",
+  oil: "white",
 
-  coal_ore: "grey",
-  uranium_ore: "lime_green",
-  stone_ore: "white",
+  coalore: "grey",
+  uraniumore: "lime_green",
+  stoneore: "white",
 
   ironplate: "cyan_blue",
   steelplate: "light_blue",

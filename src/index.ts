@@ -7,6 +7,7 @@ const builtSignals: BuiltSignal[] = []
 const signalsImageMeta: ImageMeta[] = []
 const localeNames = {}
 const localeGroupNames = {}
+const groupNameIcon = {}
 
 const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1)
 
@@ -36,7 +37,7 @@ function mapLua (signals) {
   return signals.map(sig => objLua(sig, false))
 }
 
-const alphaRange = "ABCDEFGHIJKLMNOPQRSTUVQXYZ".split("")
+const alphaRange = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
 
 function pushSignal (prefix: string, suffix: string, options: SignalOptions) {
   log(options.sort)
@@ -85,6 +86,7 @@ async function run () {
             name: signalNameFull.signalName,
             prefix: signalPrefix,
             suffix: alpha,
+            icon: signalConfig.icon,
             additionalSuffix: false
           })
 
@@ -94,6 +96,7 @@ async function run () {
 
       const localeGroupName = `outpost-signals-${ signalConfig.group }`
       localeGroupNames[localeGroupName] = `Outpost Signals ${ capitalizeFirstLetter(signalConfig.group) }`
+      groupNameIcon[signalConfig.group] = ""
       const numbers = signalConfig.types.numbers
       signalGroups.push({
         name: `virtual-signal-${ signalPrefix }`,
@@ -125,6 +128,7 @@ async function run () {
             name: signalNameFull.signalName,
             prefix: signalPrefix,
             suffix: index,
+            icon: signalConfig.icon,
             additionalSuffix: false
           })
 
@@ -144,6 +148,7 @@ async function run () {
                 name: signalNameFull2.signalName,
                 prefix: signalPrefix,
                 suffix: index,
+                icon: signalConfig.icon,
                 additionalSuffix: suffix
               })
               additionalSuffixIndex++
@@ -186,15 +191,23 @@ async function run () {
   // END
 
   // SIGNAL GROUPS
+
+  console.log("localeGroupNames", localeGroupNames)
+
   const groupSignalsToFormat = []
-  groupSignalsToFormat.push({
-    type: "item-group",
-    name: "outpost-signals",
-    order: "t",
-    inventory_order: "z",
-    icon: "__Outpost Signals__/graphics/signals.png",
-    icon_size: 32
-  })
+  const groupNames = Object.keys(localeGroupNames)
+
+  for (const name of groupNames) {
+    groupSignalsToFormat.push({
+      type: "item-group",
+      name,
+      order: "t",
+      inventory_order: "z",
+      icon: "__Outpost Signals__/graphics/signals.png",
+      icon_size: 64
+    })
+  }
+
 
   groupSignalsToFormat.push(...signalGroups.map(signalConfig => ({
     type: "item-subgroup",
@@ -216,17 +229,59 @@ async function run () {
   cfg.push("[virtual-signal-name]")
   cfg.push(objLua(localeNames, true))
   cfg.push("[item-group-name]")
+  cfg.push(objLua(localeGroupNames, true))
 
-  console.log("signalsImageMeta", signalsImageMeta)
+  fs.writeFileSync("../output/locale/en/locale.cfg", cfg.join("\n"))
+
+  // console.log("signalsImageMeta", signalsImageMeta)
 
   const imgPromises = []
   for (const imgMeta of signalsImageMeta) {
-    imgPromises.push(jimp.read(`../graphics_base/${ signalIconConfig[imgMeta.prefix] }.png`).then(value => value.write(`../output/graphics/${ imgMeta.name }.png`)).catch(e => console.error("Oops!", e)))
+    imgPromises.push(generateImage(imgMeta).catch(e => console.error(e)))
+  }
+
+  for (const group of Object.keys(groupNameIcon)) {
+    imgPromises.push(jimp.read("../graphics_base/signals.png").then(async signal => {
+      const overlay = (await jimp.read(`../graphics_base/${ group }.png`)).resize(24, 24)
+      signal.composite(overlay, 64 - 24 - 4, 64 - 24 - 4)
+      return signal
+    }).then(signal => signal.write(`../output/graphics/group-${ group }.png`)))
   }
 
   await Promise.all(imgPromises)
 
   // console.log("signalNames", signalNames)
+}
+
+async function generateImage (imgMeta: ImageMeta) {
+  const buildGraphic = await jimp.read(`../graphics_base/${ signalIconConfig[imgMeta.prefix] }.png`)
+
+  // console.log("imgMeta.suffix", imgMeta.suffix)
+
+  if (imgMeta.suffix.toString()) {
+    await jimp.loadFont(jimp.FONT_SANS_10_BLACK).then(font => {
+      const textWidth = jimp.measureText(font, imgMeta.suffix.toString())
+      const textHeight = jimp.measureTextHeight(font, imgMeta.suffix.toString(), 100)
+
+      const location = imgMeta.icon ? [16 - textWidth / 2, 2] : [16 - textWidth / 2, 16 - textHeight / 2]
+      // console.log("width", textWidth, "height", textHeight)
+      buildGraphic.print(font, location[0] , location[1], imgMeta.suffix.toString())
+    })
+  }
+
+  if (imgMeta.icon) {
+    await jimp.read(`../graphics_base/${ imgMeta.prefix }.png`)
+      .then(prefix => prefix.resize(10, 10))
+      .then(prefix => buildGraphic.composite(prefix, 11, 14))
+  }
+
+  if (imgMeta.additionalSuffix) {
+    await jimp.read(`../graphics_base/${ imgMeta.additionalSuffix }.png`)
+      .then(prefix => prefix.resize(8, 8))
+      .then(prefix => buildGraphic.composite(prefix, 4, 32 - 8 - 4))
+  }
+
+  return buildGraphic.write(`../output/graphics/${ imgMeta.name }.png`)
 }
 
 // tslint:disable-next-line: no-floating-promises
