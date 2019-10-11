@@ -48,7 +48,12 @@ const signalsConfig: Signal[] = [
     group: "ore",
     prefix: [
       "coalore",
-      "uraniumore"
+      "uraniumore",
+      "sulfuric-acid",
+      "lubricant",
+      "petroleum-gas",
+      "light-oil",
+      "heavy-oil"
     ],
     icon: true,
     types: {
@@ -197,6 +202,12 @@ export const signalIconConfig = {
   coalore: "grey",
   uraniumore: "lime_green",
   stoneore: "white",
+
+  "sulfuric-acid": "red",
+  lubricant: "green",
+  "petroleum-gas": "pink",
+  "light-oil": "yellow",
+  "heavy-oil": "orange",
 
   ironplate: "cyan_blue",
   steelplate: "light_blue",
